@@ -1,16 +1,27 @@
-from locust import HttpLocust, TaskSet
-
-def index(l):
-    l.client.get('/')
+from locust import HttpLocust, TaskSet, task
 
 class UserBehavior(TaskSet):
-    tasks = { index: 10 }
+    @task(1)
+    def node_nonfunc(self):
+        self.client.get('/nonfunctionalsum')
 
-    def on_start(self):
-        index(self)
+    @task(1)
+    def node_sync_call(self):
+        self.client.get('/reducenative')
+
+    @task(1)
+    def node_async_call(self):
+        self.client.get('/reduceasync')
+
+    @task(1)
+    def node_ramda_blocking_call(self):
+        self.client.get('/reduceramdablocking')
+
+    @task(1)
+    def node_ramda_nonblocking_call(self):
+        self.client.get('/reduceramdanonblocking')
 
 class WebsiteUser(HttpLocust):
     task_set = UserBehavior
-    min_wait = 5000
-    max_wait = 9000
-
+    min_wait = 1000
+    max_wait = 3000
